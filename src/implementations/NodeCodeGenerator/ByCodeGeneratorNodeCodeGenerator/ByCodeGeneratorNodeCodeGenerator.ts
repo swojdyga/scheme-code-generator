@@ -79,7 +79,7 @@ export default class ByCodeGeneratorNodeCodeGenerator implements NodeCodeGenerat
     }
 
     private async loadConfig(pwd: string): Promise<CodeGeneratorParamsConfig> {
-        const config = (await fs.promises.readFile(resolve(pwd, "./code-generator/config.ts"))).toString();
+        const config = (await fs.promises.readFile(resolve(pwd, "./scheme-code-generator/config.ts"))).toString();
 
         const fsMap = tsvfs.createDefaultMapFromNodeModules({ target: ts.ScriptTarget.ES2015 });
         fsMap.set("index.ts", config);

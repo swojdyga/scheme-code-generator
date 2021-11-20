@@ -1,6 +1,6 @@
 {
   "name": "scheme-code-generator",
-  "version": "0.0.1-alpha",
+  "version": "0.0.2-alpha",
   "description": "",
   "main": "./build/entrypoints/main/index.js",
   "types": "./build/entrypoints/main/index.d.ts",
