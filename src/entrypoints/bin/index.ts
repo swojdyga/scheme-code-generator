@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 import ByCodeGeneratorNodeCodeGenerator from "../../implementations/NodeCodeGenerator/ByCodeGeneratorNodeCodeGenerator/ByCodeGeneratorNodeCodeGenerator";
 import MainCodeGenerator from "../../implementations/CodeGenerator/MainCodeGenerator/MainCodeGenerator";
 
