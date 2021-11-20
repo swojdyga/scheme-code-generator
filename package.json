@@ -1,11 +1,11 @@
 {
   "name": "scheme-code-generator",
-  "version": "0.0.2-alpha",
+  "version": "0.0.3-alpha",
   "description": "",
   "main": "./build/entrypoints/main/index.js",
   "types": "./build/entrypoints/main/index.d.ts",
   "bin": {
-    "codegen": "./build/bin/index.js"
+    "codegen": "./build/entrypoints/bin/index.js"
   },
   "scripts": {
     "build": "tsc"
