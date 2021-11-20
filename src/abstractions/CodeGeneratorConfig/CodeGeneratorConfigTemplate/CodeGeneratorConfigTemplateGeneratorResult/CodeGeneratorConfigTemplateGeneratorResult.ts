@@ -1,0 +1,5 @@
+import CodeGeneratorConfigTemplateGeneratorResultFile from "./CodeGeneratorConfigTemplateGeneratorResultFile/CodeGeneratorConfigTemplateGeneratorResultFile";
+
+export default interface CodeGeneratorConfigTemplateGeneratorResult {
+    files: CodeGeneratorConfigTemplateGeneratorResultFile[];
+}

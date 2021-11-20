@@ -1,0 +1,27 @@
+{
+    "compilerOptions": {
+        "module": "CommonJS",
+        "target": "es5",
+        "moduleResolution": "node",
+        "declaration": true,
+        "noImplicitReturns": true,
+        "noUnusedLocals": true,
+        "strict": true,
+        "strictBindCallApply": true,
+        "strictPropertyInitialization": true,
+        "downlevelIteration": true,
+        "declarationDir": "build",
+        "outDir": "build",
+        "lib": [
+            "dom"
+        ],
+        "typeRoots": [
+            "./node_modules/@types",
+            "./@types"
+        ],
+    },
+    "include": [
+        "src/entrypoints/bin/index.ts",
+        "src/entrypoints/main/index.ts",
+    ]
+  }

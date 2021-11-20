@@ -1,11 +1,29 @@
 {
-  "name": "code-generator",
-  "version": "0.0.1",
+  "name": "scheme-code-generator",
+  "version": "0.0.1-alpha",
   "description": "",
-  "main": "index.js",
+  "main": "./build/entrypoints/main/index.js",
+  "types": "./build/entrypoints/main/index.d.ts",
+  "bin": {
+    "codegen": "./build/bin/index.js"
+  },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "tsc"
   },
   "author": "Sebastian Wojdyga",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "@types/chai": "^4.2.22",
+    "@types/lz-string": "^1.3.34",
+    "@types/mocha": "^9.0.0",
+    "chai": "^4.3.4",
+    "esm": "^3.2.25",
+    "lz-string": "^1.4.4",
+    "mocha": "^9.1.3",
+    "ts-node": "^10.4.0"
+  },
+  "dependencies": {
+    "@typescript/vfs": "^1.3.5",
+    "typescript": "^4.5.2"
+  }
 }
