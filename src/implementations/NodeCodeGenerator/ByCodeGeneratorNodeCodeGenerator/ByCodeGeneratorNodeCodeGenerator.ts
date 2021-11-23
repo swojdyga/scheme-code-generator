@@ -28,6 +28,10 @@ export default class ByCodeGeneratorNodeCodeGenerator implements NodeCodeGenerat
 
         const params = this.convertArgsToParams(restArgs);
         const config = await this.loadConfig(pwd);
+        if(!config) {
+            console.log('Failed to find config file.');
+            return;
+        }
 
         await this.codeGenerator.generateCode({
             basePath: pwd,
@@ -78,8 +82,14 @@ export default class ByCodeGeneratorNodeCodeGenerator implements NodeCodeGenerat
         return argKey.slice(0, 2) === '--';
     }
 
-    private async loadConfig(pwd: string): Promise<CodeGeneratorParamsConfig> {
-        const config = (await fs.promises.readFile(resolve(pwd, "./scheme-code-generator/config.ts"))).toString();
+    private loadConfig(pwd: string): CodeGeneratorParamsConfig | false {
+        const configPath = resolve(pwd, "./scheme-code-generator/config.ts");
+
+        if(!fs.existsSync(configPath)) {
+            return false;
+        }
+
+        const config = fs.readFileSync(resolve(pwd, "./scheme-code-generator/config.ts")).toString();
 
         const fsMap = tsvfs.createDefaultMapFromNodeModules({ target: ts.ScriptTarget.ES2015 });
         fsMap.set("index.ts", config);
