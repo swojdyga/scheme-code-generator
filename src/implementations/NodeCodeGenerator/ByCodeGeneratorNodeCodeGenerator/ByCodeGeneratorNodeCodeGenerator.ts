@@ -17,12 +17,12 @@ export default class ByCodeGeneratorNodeCodeGenerator implements NodeCodeGenerat
         const [templateName, destinationPath, ...restArgs] = args;
 
         if(templateName === undefined) {
-            console.log('templateName is required.');
+            console.log('TemplateName is required.');
             return;
         }
     
         if(destinationPath === undefined) {
-            console.log(`destinationPath is required.`);
+            console.log(`DestinationPath is required.`);
             return;
         }
 
