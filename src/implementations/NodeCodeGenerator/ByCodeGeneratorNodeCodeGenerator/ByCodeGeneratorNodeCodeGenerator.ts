@@ -6,16 +6,20 @@ import {resolve} from "path";
 import CodeGeneratorParamsConfig from "../../../abstractions/CodeGeneratorConfig/CodeGeneratorConfig";
 import * as ts from "typescript";
 import * as tsvfs from "@typescript/vfs";
+import ArgsParser from "../../../abstractions/ArgsParser/ArgsParser";
 
 export default class ByCodeGeneratorNodeCodeGenerator implements NodeCodeGenerator {
     public constructor(
         private readonly codeGenerator: CodeGenerator,
+        private readonly argsParser: ArgsParser,
     ) {
 
     }
 
     public async generateCode(pwd: string, args: string[]): Promise<void> {
-        const [templateName, destinationPath, ...restArgs] = args;
+        const parseredArgs = this.argsParser.parse(args);
+
+        const [templateName, destinationPath] = parseredArgs.args;
 
         if(templateName === undefined) {
             console.log('TemplateName is required.');
@@ -37,7 +41,7 @@ export default class ByCodeGeneratorNodeCodeGenerator implements NodeCodeGenerat
             basePath: realPwd,
             templateName,
             destinationPath: this.getRealDestinationPath(pwd, realPwd, destinationPath),
-            params: this.convertArgsToParams(restArgs),
+            params: parseredArgs.keyValuesArgs,
             config: this.loadConfig(realPwd),
         });
     }
@@ -91,45 +95,5 @@ export default class ByCodeGeneratorNodeCodeGenerator implements NodeCodeGenerat
         }
     
         return requireFromString(fsMap.get('index.js'), '').codeGeneratorConfig;
-    }
-
-    private convertArgsToParams(args: string[]): {[key: string]: string} {
-        const argsKeys = args.filter(
-            (arg, index) => this.isKeyArg(index),
-        );
-
-        const argsValues = args.filter(
-            (arg, index) => !this.isKeyArg(index),
-        );
-
-        const indexesWithInvalidArgs = argsKeys
-            .map((argKey, index) => {
-                if(this.isCorrectArgKey(argKey)) {
-                    return null;
-                }
-
-                return index;
-            })
-            .filter((indexOrNull) => indexOrNull !== null);
-
-        const validArgsKeys = argsKeys
-            .filter((argsKey, index) => !indexesWithInvalidArgs.includes(index));
-
-        const validArgsValues = argsValues
-            .filter((argsKey, index) => !indexesWithInvalidArgs.includes(index));
-
-        return validArgsKeys
-            .reduce((params, validArgKey, index) => ({
-                ...params,
-                [validArgKey.slice(2)]: validArgsValues[index],
-            }), {});
-    }
-
-    private isKeyArg(index: number): boolean {
-        return index % 2 === 0;
-    }
-
-    private isCorrectArgKey(argKey: string): boolean {
-        return argKey.slice(0, 2) === '--';
     }
 }
