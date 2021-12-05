@@ -4,14 +4,15 @@ import * as fs from "fs";
 import * as path from "path";
 import {resolve} from "path";
 import CodeGeneratorParamsConfig from "../../../abstractions/CodeGeneratorConfig/CodeGeneratorConfig";
-import * as ts from "typescript";
-import * as tsvfs from "@typescript/vfs";
 import ArgsParser from "../../../abstractions/ArgsParser/ArgsParser";
+import TypeScriptInlineCompiler from "../../../abstractions/TypeScriptInlineCompiler/TypeScriptInlineCompiler";
+import TypeScriptInlineCompilerFailedResult from "../../../abstractions/TypeScriptInlineCompiler/TypeScriptInlineCompilerFailedResult/TypeScriptInlineCompilerFailedResult";
 
 export default class ByCodeGeneratorNodeCodeGenerator implements NodeCodeGenerator {
     public constructor(
         private readonly codeGenerator: CodeGenerator,
         private readonly argsParser: ArgsParser,
+        private readonly typeScriptInlineCompiler: TypeScriptInlineCompiler,
     ) {
 
     }
@@ -37,12 +38,26 @@ export default class ByCodeGeneratorNodeCodeGenerator implements NodeCodeGenerat
             return;
         }
 
+        const config = this.loadConfig(realPwd);
+        if('errors' in config) {
+            console.log(`Error during compiling config:\n\n${config.errors
+                .map((error) => {
+                    if(error.fileName !== null) {
+                        return `${error.fileName}:${error.line}: ${error.error}`;
+                    }
+
+                    return error.error;
+                })
+                .join(`\n\n`)}`);
+            return;
+        }
+
         await this.codeGenerator.generateCode({
             basePath: realPwd,
             templateName,
             destinationPath: this.getRealDestinationPath(pwd, realPwd, destinationPath),
             params: parseredArgs.keyValuesArgs,
-            config: this.loadConfig(realPwd),
+            config,
         });
     }
 
@@ -70,23 +85,14 @@ export default class ByCodeGeneratorNodeCodeGenerator implements NodeCodeGenerat
         return restOfPwd + path.sep + destinationPath;
     }
     
-    private loadConfig(pwd: string): CodeGeneratorParamsConfig {
-        const config = fs.readFileSync(resolve(pwd, "./scheme-code-generator/config.ts")).toString();
+    private loadConfig(pwd: string): CodeGeneratorParamsConfig | TypeScriptInlineCompilerFailedResult {
+        const path = resolve(pwd, "./scheme-code-generator/config.ts");
+        const configSourceRaw = fs.readFileSync(path).toString();
+        const configSource = this.typeScriptInlineCompiler.compile(path, configSourceRaw);
+        if(typeof configSource !== "string") {
+            return configSource;
+        }
 
-        const fsMap = tsvfs.createDefaultMapFromNodeModules({ target: ts.ScriptTarget.ES2015 });
-        fsMap.set("index.ts", config);
-
-        const system = tsvfs.createSystem(fsMap)
-        const host = tsvfs.createVirtualCompilerHost(system, {}, ts);
-
-        const program = ts.createProgram({
-            rootNames: [...fsMap.keys()],
-            options: {},
-            host: host.compilerHost,
-        });
-
-        program.emit();
-        
         function requireFromString(src: any, filename: any) {
             var Module: any = module.constructor;
             var m = new Module();
@@ -94,6 +100,6 @@ export default class ByCodeGeneratorNodeCodeGenerator implements NodeCodeGenerat
             return m.exports;
         }
     
-        return requireFromString(fsMap.get('index.js'), '').codeGeneratorConfig;
+        return requireFromString(configSource, '').codeGeneratorConfig;
     }
 }
